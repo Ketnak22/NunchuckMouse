@@ -29,6 +29,10 @@ Nunchuk nchuk;
 // Pin number of built-in LED
 #define LED_PIN 25
 
+// I2C Pins
+#define SDA_PIN 4
+#define SCL_PIN 5
+
 // Blink built-in LED for half a second
 void blink_led() {
   digitalWrite(LED_PIN, HIGH);   // turn the LED on
@@ -42,15 +46,15 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
 
   // Initialize Wire
-  Wire.setSDA(4);
-  Wire.setSCL(5);
+  Wire.setSDA(SDA_PIN);
+  Wire.setSCL(SCL_PIN);
   Wire.begin();
 
   blink_led(); // Debug info
 
   // Initialize Nunchuck
-	nchuk.begin();
-	while (!nchuk.connect());
+  nchuk.begin();
+  while (!nchuk.connect());
 
   blink_led(); // Debug info
 
@@ -63,7 +67,7 @@ void setup() {
 void loop() {
   if (nchuk.update()) {
     // Get joystick values
-	  int joyX = nchuk.joyX();
+    int joyX = nchuk.joyX();
     int joyY = nchuk.joyY();
 
     // Map joystick values to mouse movement
