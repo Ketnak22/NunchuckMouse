@@ -25,10 +25,20 @@
 
 Nunchuk nchuk;
 bool connected = false;
+bool calibrated = false;
 int failedReads = 0;
+int centerX = 128;
+int centerY = 128;
 
 // Declare mouse sensitivity (the lower the sensitivity, the slower the mouse)
 #define SENSITIVITY 10
+
+// Raw joystick units (0-255) around the center that count as no movement
+#define DEADZONE 8
+
+// If the stick reads further than this from 128 when plugged in, someone is
+// holding it, so keep 128 instead of calibrating to a tilted stick.
+#define MAX_CENTER_OFFSET 25
 
 // WS2812 status LED on the RP2040-Mini
 #define LED_PIN 16
@@ -99,6 +109,7 @@ void loop() {
       return;
     }
     failedReads = 0;
+    calibrated = false;
     showStatus(true);
   }
 
@@ -109,12 +120,24 @@ void loop() {
     int joyX = nchuk.joyX();
     int joyY = nchuk.joyY();
 
-    // Map joystick values to mouse movement
-    int mouseX = map(joyX, 0, 255, -SENSITIVITY, SENSITIVITY);
-    int mouseY = -map(joyY, 0, 255, -SENSITIVITY, SENSITIVITY); // Also invert Y movement
+    // Every stick rests a bit off 128, so take the center from the first
+    // reading after plugging in.
+    if (!calibrated) {
+      centerX = abs(joyX - 128) <= MAX_CENTER_OFFSET ? joyX : 128;
+      centerY = abs(joyY - 128) <= MAX_CENTER_OFFSET ? joyY : 128;
+      calibrated = true;
+    }
 
-    // Check if joystick movement is outside the dead zone
-    if (abs(mouseX) > 1 || abs(mouseY) > 1) {
+    int dx = joyX - centerX;
+    int dy = joyY - centerY;
+    if (abs(dx) <= DEADZONE) dx = 0;
+    if (abs(dy) <= DEADZONE) dy = 0;
+
+    // Map joystick values to mouse movement
+    int mouseX = dx * SENSITIVITY / 128;
+    int mouseY = -dy * SENSITIVITY / 128; // Also invert Y movement
+
+    if (mouseX != 0 || mouseY != 0) {
       Mouse.move(mouseX, mouseY);
     }
 
