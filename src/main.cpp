@@ -18,6 +18,7 @@
     - -: ground of power supply
 */
 
+#include <Arduino.h>
 #include <Mouse.h>
 #include <NintendoExtensionCtrl.h>
 
