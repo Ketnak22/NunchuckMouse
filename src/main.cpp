@@ -1,21 +1,20 @@
 /*
-  This project enables the use of a Nintendo Nunchuck controller as a mouse input device. 
-  By using the controller's joystick, you can control mouse movements, and by using the C 
-  and Z buttons, you can perform left and right clicks.
+  Wii Nunchuck as a USB mouse, running on the RP2040-Mini of the RP2040_Wii
+  board (see hardware/).
 
-  LED Blink Codes:
-  The built-in LED provides visual feedback during the initialization process. The number of 
-  blinks corresponds to the following statuses:
-    - 0 blinks: Wire library initialization failed
-    - 1 blink: Nunchuck initialization failed
-    - 2 blinks: Mouse initialization failed
-    - 3 blinks: Everything initialized successfully
+  Controls:
+    - joystick: move the cursor
+    - Z: left click
+    - C: right click
 
-  Ensure that the Nunchuck is properly connected (using Raspberry Pi Pico as example):
-    - SDA: physical pin 6
-    - SCL: physical pin 7
-    - +: 3.3V power supply (anything over 3.3V will fry your nunchuck, so be sure!)
-    - -: ground of power supply
+  Status LED (WS2812 on GP16): red = no Nunchuck, green = working.
+
+  Nunchuck socket on the board:
+    - SDA: GP0
+    - SCL: GP1
+    - DET: GP11, HIGH while a Nunchuck is plugged in
+    - +: 3.3 V (anything over 3.3 V will fry the Nunchuck)
+    - -: GND
 */
 
 #include <Arduino.h>
