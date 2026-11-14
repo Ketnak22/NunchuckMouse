@@ -31,8 +31,8 @@ Nunchuk nchuk;
 #define LED_PIN 25
 
 // I2C Pins
-#define SDA_PIN 4
-#define SCL_PIN 5
+#define SDA_PIN 0
+#define SCL_PIN 1
 
 // Blink built-in LED for half a second
 void blink_led() {
