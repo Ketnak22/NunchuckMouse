@@ -23,12 +23,18 @@
 #include <NintendoExtensionCtrl.h>
 
 Nunchuk nchuk;
+bool connected = false;
+int failedReads = 0;
 
 // Declare mouse sensitivity (the lower the sensitivity, the slower the mouse)
 #define SENSITIVITY 10
 
 // Pin number of built-in LED
 #define LED_PIN 25
+
+// A freshly connected Nunchuck often fails its first reads, so one failure
+// doesn't mean it was unplugged.
+#define MAX_FAILED_READS 10
 
 // I2C Pins
 #define SDA_PIN 0
@@ -43,6 +49,9 @@ void blink_led() {
 }
 
 void setup() {
+  // Mouse.begin() re-enumerates USB, so it goes first to make the mouse show up right away.
+  Mouse.begin();
+
   // Setup LED Pin
   pinMode(LED_PIN, OUTPUT);
 
@@ -55,18 +64,23 @@ void setup() {
 
   // Initialize Nunchuck
   nchuk.begin();
-  while (!nchuk.connect());
-
-  blink_led(); // Debug info
-
-  // Initialize mouse
-  Mouse.begin();
 
   blink_led(); // Debug info
 }
 
 void loop() {
+  if (!connected) {
+    connected = nchuk.connect();
+    if (!connected) {
+      delay(100); // No need to poll an empty socket at full speed
+      return;
+    }
+    failedReads = 0;
+  }
+
   if (nchuk.update()) {
+    failedReads = 0;
+
     // Get joystick values
     int joyX = nchuk.joyX();
     int joyY = nchuk.joyY();
@@ -93,8 +107,12 @@ void loop() {
     } else {
       Mouse.release(MOUSE_RIGHT);
     }
-  } else {
-    while (!nchuk.update()); // Wait until data is available again
+  } else if (++failedReads >= MAX_FAILED_READS) {
+    // Otherwise a click held while unplugging stays pressed on the PC.
+    Mouse.release(MOUSE_LEFT);
+    Mouse.release(MOUSE_RIGHT);
+    // A replugged Nunchuck has to be initialized again before it sends data.
+    connected = false;
   }
   delay(1); // Brief delay to prevent overwhelming Nunchuck with readings
 
