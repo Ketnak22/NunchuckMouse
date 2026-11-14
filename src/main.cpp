@@ -40,6 +40,9 @@ int failedReads = 0;
 #define SDA_PIN 0
 #define SCL_PIN 1
 
+// Tied to 3.3 V inside the Nunchuck, so it reads HIGH only when one is plugged in
+#define DET_PIN 11
+
 // Blink built-in LED for half a second
 void blink_led() {
   digitalWrite(LED_PIN, HIGH);   // turn the LED on
@@ -48,12 +51,21 @@ void blink_led() {
   delay(500);
 }
 
+void disconnect() {
+  // Otherwise a click held while unplugging stays pressed on the PC.
+  Mouse.release(MOUSE_LEFT);
+  Mouse.release(MOUSE_RIGHT);
+  // A replugged Nunchuck has to be initialized again before it sends data.
+  connected = false;
+}
+
 void setup() {
   // Mouse.begin() re-enumerates USB, so it goes first to make the mouse show up right away.
   Mouse.begin();
 
   // Setup LED Pin
   pinMode(LED_PIN, OUTPUT);
+  pinMode(DET_PIN, INPUT_PULLDOWN);
 
   // Initialize Wire
   Wire.setSDA(SDA_PIN);
@@ -69,6 +81,13 @@ void setup() {
 }
 
 void loop() {
+  if (digitalRead(DET_PIN) == LOW) {
+    if (connected) {
+      disconnect();
+    }
+    return;
+  }
+
   if (!connected) {
     connected = nchuk.connect();
     if (!connected) {
@@ -108,11 +127,8 @@ void loop() {
       Mouse.release(MOUSE_RIGHT);
     }
   } else if (++failedReads >= MAX_FAILED_READS) {
-    // Otherwise a click held while unplugging stays pressed on the PC.
-    Mouse.release(MOUSE_LEFT);
-    Mouse.release(MOUSE_RIGHT);
-    // A replugged Nunchuck has to be initialized again before it sends data.
-    connected = false;
+    // Still needed with DET: when unplugging, I2C fails before DET goes low.
+    disconnect();
   }
   delay(1); // Brief delay to prevent overwhelming Nunchuck with readings
 
