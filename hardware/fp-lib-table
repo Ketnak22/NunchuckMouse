@@ -1,0 +1,5 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "RP2040-Zero")(type "KiCad")(uri "${KIPRJMOD}/RP2040-Zero-KiCAD-main/RP2040-Zero.pretty")(options "")(descr ""))
+  (lib (name "WiiConnector")(type "KiCad")(uri "${KIPRJMOD}/WiiConnector")(options "")(descr ""))
+)

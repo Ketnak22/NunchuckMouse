@@ -1,0 +1,6 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "rp2040-zero")(type "KiCad")(uri "${KIPRJMOD}/RP2040-Zero-Kicad-main/rp2040-zero.kicad_sym")(options "")(descr ""))
+  (lib (name "Connector")(type "KiCad")(uri "${KIPRJMOD}/WiiConnector/Connector.kicad_sym")(options "")(descr ""))
+  (lib (name "RP2040-Zero")(type "KiCad")(uri "${KIPRJMOD}/RP2040-Zero-KiCAD-main/RP2040-Zero.kicad_sym")(options "")(descr ""))
+)

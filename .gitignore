@@ -3,3 +3,12 @@
 .idea/
 *.swp
 .DS_Store
+
+# KiCad
+*-backups/
+*_copy.*
+fp-info-cache
+*.kicad_prl
+*.rpt
+*.zip
+!hardware/Gerber.zip
