@@ -21,6 +21,7 @@
 #include <Arduino.h>
 #include <Mouse.h>
 #include <NintendoExtensionCtrl.h>
+#include <Adafruit_NeoPixel.h>
 
 Nunchuk nchuk;
 bool connected = false;
@@ -29,8 +30,9 @@ int failedReads = 0;
 // Declare mouse sensitivity (the lower the sensitivity, the slower the mouse)
 #define SENSITIVITY 10
 
-// Pin number of built-in LED
-#define LED_PIN 25
+// WS2812 status LED on the RP2040-Mini
+#define LED_PIN 16
+#define LED_BRIGHTNESS 20 // out of 255, full brightness is blinding
 
 // A freshly connected Nunchuck often fails its first reads, so one failure
 // doesn't mean it was unplugged.
@@ -43,12 +45,16 @@ int failedReads = 0;
 // Tied to 3.3 V inside the Nunchuck, so it reads HIGH only when one is plugged in
 #define DET_PIN 11
 
-// Blink built-in LED for half a second
-void blink_led() {
-  digitalWrite(LED_PIN, HIGH);   // turn the LED on
-  delay(500);                       
-  digitalWrite(LED_PIN, LOW);    // turn the LED off
-  delay(500);
+Adafruit_NeoPixel led(1, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+// Green when the Nunchuck works, red when there is none
+void showStatus(bool ok) {
+  if (ok) {
+    led.setPixelColor(0, led.Color(0, LED_BRIGHTNESS, 0));
+  } else {
+    led.setPixelColor(0, led.Color(LED_BRIGHTNESS, 0, 0));
+  }
+  led.show();
 }
 
 void disconnect() {
@@ -57,14 +63,16 @@ void disconnect() {
   Mouse.release(MOUSE_RIGHT);
   // A replugged Nunchuck has to be initialized again before it sends data.
   connected = false;
+  showStatus(false);
 }
 
 void setup() {
   // Mouse.begin() re-enumerates USB, so it goes first to make the mouse show up right away.
   Mouse.begin();
 
-  // Setup LED Pin
-  pinMode(LED_PIN, OUTPUT);
+  led.begin();
+  showStatus(false);
+
   pinMode(DET_PIN, INPUT_PULLDOWN);
 
   // Initialize Wire
@@ -72,12 +80,8 @@ void setup() {
   Wire.setSCL(SCL_PIN);
   Wire.begin();
 
-  blink_led(); // Debug info
-
   // Initialize Nunchuck
   nchuk.begin();
-
-  blink_led(); // Debug info
 }
 
 void loop() {
@@ -95,6 +99,7 @@ void loop() {
       return;
     }
     failedReads = 0;
+    showStatus(true);
   }
 
   if (nchuk.update()) {
