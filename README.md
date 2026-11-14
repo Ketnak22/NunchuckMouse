@@ -1,10 +1,10 @@
 # NunchuckMouse
 
-Wii Nunchuck jako mysz USB. Drążek rusza kursorem, Z to lewy klik, C to prawy. Firmware w Arduino na RP2040-Mini, osadzonym na własnej płytce z gniazdem Wii, zaprojektowanej w KiCadzie. Działający prototyp, zbudowany i używany przeze mnie.
+Wii Nunchuck jako mysz USB. Drążek rusza kursorem, Z to lewy klik, C to prawy. Firmware w Arduino na RP2040-Zero, osadzonym na własnej płytce z gniazdem Wii, zaprojektowanej w KiCadzie. Działający prototyp, zbudowany i używany przeze mnie.
 
 ---
 
-A Wii Nunchuck used as a USB mouse. An RP2040-Mini reads the Nunchuck over I2C and shows up on the PC as a regular HID mouse, so no driver is needed. The module sits on a small PCB I designed in KiCad, with a Wii extension socket.
+A Wii Nunchuck used as a USB mouse. An RP2040-Zero reads the Nunchuck over I2C and shows up on the PC as a regular HID mouse, so no driver is needed. The module sits on a small PCB I designed in KiCad, with a Wii extension socket.
 
 Status: working prototype, built and used by me.
 
@@ -29,7 +29,7 @@ The RGB LED on the module shows the state:
 
 A two-layer, 33 × 42.5 mm board with:
 
-- an RP2040-Mini module,
+- an RP2040-Zero module,
 - a 6-pin Wii extension socket,
 - four 2.5 mm mounting holes.
 
@@ -67,7 +67,7 @@ The board's own outline is closed. The cutout lines are in the Gerbers too, but 
 
 The first version of the firmware set I2C to GP4/GP5, which don't reach the socket on this board. An I2C scan on the assembled board found the Nunchuck on GP0/GP1 and confirmed DET on GP11, the same as in the schematic and PCB. So the design files were right and the firmware was fixed.
 
-The board uses the RP2040-Zero footprint from [`hardware/RP2040-Zero-KiCAD-main/`](hardware/RP2040-Zero-KiCAD-main/). Its author marks it as untested. With the RP2040-Mini I used, the pins this board needs are in the right places.
+The board uses the RP2040-Zero footprint from [`hardware/RP2040-Zero-KiCAD-main/`](hardware/RP2040-Zero-KiCAD-main/). Its author marks it as untested, but the pins this board needs are in the right places.
 
 ## Building and flashing
 

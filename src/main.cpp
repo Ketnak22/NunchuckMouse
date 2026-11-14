@@ -1,5 +1,5 @@
 /*
-  Wii Nunchuck as a USB mouse, running on the RP2040-Mini of the RP2040_Wii
+  Wii Nunchuck as a USB mouse, running on the RP2040-Zero of the RP2040_Wii
   board (see hardware/).
 
   Controls:
@@ -38,7 +38,7 @@ int centerY = 128;
 // holding it, so keep 128 instead of calibrating to a tilted stick.
 #define MAX_CENTER_OFFSET 25
 
-// WS2812 status LED on the RP2040-Mini
+// WS2812 status LED on the RP2040-Zero
 #define LED_PIN 16
 #define LED_BRIGHTNESS 20 // out of 255, full brightness is blinding
 
