@@ -29,7 +29,6 @@ int failedReads = 0;
 int centerX = 128;
 int centerY = 128;
 
-// Declare mouse sensitivity (the lower the sensitivity, the slower the mouse)
 #define SENSITIVITY 10
 
 // Raw joystick units (0-255) around the center that count as no movement
@@ -47,7 +46,6 @@ int centerY = 128;
 // doesn't mean it was unplugged.
 #define MAX_FAILED_READS 10
 
-// I2C Pins
 #define SDA_PIN 0
 #define SCL_PIN 1
 
@@ -56,7 +54,6 @@ int centerY = 128;
 
 Adafruit_NeoPixel led(1, LED_PIN, NEO_GRB + NEO_KHZ800);
 
-// Green when the Nunchuck works, red when there is none
 void showStatus(bool ok) {
   if (ok) {
     led.setPixelColor(0, led.Color(0, LED_BRIGHTNESS, 0));
@@ -84,12 +81,10 @@ void setup() {
 
   pinMode(DET_PIN, INPUT_PULLDOWN);
 
-  // Initialize Wire
   Wire.setSDA(SDA_PIN);
   Wire.setSCL(SCL_PIN);
   Wire.begin();
 
-  // Initialize Nunchuck
   nchuk.begin();
 }
 
@@ -115,7 +110,6 @@ void loop() {
   if (nchuk.update()) {
     failedReads = 0;
 
-    // Get joystick values
     int joyX = nchuk.joyX();
     int joyY = nchuk.joyY();
 
@@ -132,22 +126,19 @@ void loop() {
     if (abs(dx) <= DEADZONE) dx = 0;
     if (abs(dy) <= DEADZONE) dy = 0;
 
-    // Map joystick values to mouse movement
     int mouseX = dx * SENSITIVITY / 128;
-    int mouseY = -dy * SENSITIVITY / 128; // Also invert Y movement
+    int mouseY = -dy * SENSITIVITY / 128; // Stick up is +Y, screen up is -Y
 
     if (mouseX != 0 || mouseY != 0) {
       Mouse.move(mouseX, mouseY);
     }
 
-    // Press left mouse button if Z button is pressed on Nunchuck
     if (nchuk.buttonZ()) {
       Mouse.press(MOUSE_LEFT);
     } else {
       Mouse.release(MOUSE_LEFT);
     }
 
-    // Press right mouse button if C button is pressed on Nunchuck
     if (nchuk.buttonC()) {
       Mouse.press(MOUSE_RIGHT);
     } else {
