@@ -1,20 +1,8 @@
 /*
-  Wii Nunchuck as a USB mouse, running on the RP2040-Zero of the RP2040_Wii
-  board (see hardware/).
+  NunchuckMouse: Wii Nunchuck as a USB mouse on the RP2040_Wii board
+  (see hardware/). Controls, LED and wiring are described in README.md.
 
-  Controls:
-    - joystick: move the cursor
-    - Z: left click
-    - C: right click
-
-  Status LED (WS2812 on GP16): red = no Nunchuck, green = working.
-
-  Nunchuck socket on the board:
-    - SDA: GP0
-    - SCL: GP1
-    - DET: GP11, HIGH while a Nunchuck is plugged in
-    - +: 3.3 V (anything over 3.3 V will fry the Nunchuck)
-    - -: GND
+  The Nunchuck runs on 3.3 V only. Anything higher will damage it.
 */
 
 #include <Arduino.h>
@@ -31,8 +19,7 @@ int centerY = 128;
 
 #define SENSITIVITY 10
 
-// Raw joystick units (0-255) around the center that count as no movement
-#define DEADZONE 8
+#define DEADZONE 8 // raw stick units (0-255)
 
 // If the stick reads further than this from 128 when plugged in, someone is
 // holding it, so keep 128 instead of calibrating to a tilted stick.
@@ -64,7 +51,7 @@ void showStatus(bool ok) {
 }
 
 void disconnect() {
-  // Otherwise a click held while unplugging stays pressed on the PC.
+  // Release both buttons, or a click held while unplugging stays pressed on the PC.
   Mouse.release(MOUSE_LEFT);
   Mouse.release(MOUSE_RIGHT);
   // A replugged Nunchuck has to be initialized again before it sends data.
@@ -73,7 +60,6 @@ void disconnect() {
 }
 
 void setup() {
-  // Mouse.begin() re-enumerates USB, so it goes first to make the mouse show up right away.
   Mouse.begin();
 
   led.begin();
@@ -99,7 +85,7 @@ void loop() {
   if (!connected) {
     connected = nchuk.connect();
     if (!connected) {
-      delay(100); // No need to poll an empty socket at full speed
+      delay(100); // Retry in a moment.
       return;
     }
     failedReads = 0;
@@ -113,8 +99,8 @@ void loop() {
     int joyX = nchuk.joyX();
     int joyY = nchuk.joyY();
 
-    // Every stick rests a bit off 128, so take the center from the first
-    // reading after plugging in.
+    // My Nunchuck rests at X = 124, Y = 128 instead of 128, 128, so take the
+    // center from the first reading after plugging in.
     if (!calibrated) {
       centerX = abs(joyX - 128) <= MAX_CENTER_OFFSET ? joyX : 128;
       centerY = abs(joyY - 128) <= MAX_CENTER_OFFSET ? joyY : 128;
@@ -145,9 +131,8 @@ void loop() {
       Mouse.release(MOUSE_RIGHT);
     }
   } else if (++failedReads >= MAX_FAILED_READS) {
-    // Still needed with DET: when unplugging, I2C fails before DET goes low.
+    // Still needed with DET. When unplugging, I2C fails before DET goes low.
     disconnect();
   }
-  delay(1); // Brief delay to prevent overwhelming Nunchuck with readings
-
+  delay(1);
 }
