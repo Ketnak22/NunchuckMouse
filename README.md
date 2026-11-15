@@ -22,7 +22,7 @@ The RGB LED on the module is red when there's no Nunchuck and green when one is 
 
 ## Board
 
-I started from the [Wii connector pinout on ConsoleMods](https://consolemods.org/wiki/Wii:Connector_Pinouts). Before designing anything bigger, I ordered a test board with just the socket, using footprints from a [KiCad library merge request](https://gitlab.com/kicad/libraries/kicad-footprints/-/merge_requests/3351), and a few sockets from AliExpress. Once that worked, I designed this board around the same pinout. All it does is connect an RP2040-Zero to the socket.
+I started from the [Wii connector pinout on ConsoleMods](https://consolemods.org/wiki/Wii:Connector_Pinouts). For the first tests I used a cheap ready-made Nunchuck breakout from AliExpress. Then, to check that the footprint was right, I ordered a test board with just the socket, using footprints from a [KiCad library merge request](https://gitlab.com/kicad/libraries/kicad-footprints/-/merge_requests/3351), and a few sockets from AliExpress. Once that worked, I designed this board around the same pinout. All it does is connect an RP2040-Zero to the socket.
 
 It's a two-layer, 33 × 42.5 mm board with an RP2040-Zero module, a 6-pin Wii extension socket and four 2.5 mm mounting holes. There are no other parts. The Nunchuck is powered from the module's 3.3 V regulator.
 
